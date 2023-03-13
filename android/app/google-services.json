@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1022541000351",
+    "firebase_url": "https://react-task-c2c86-default-rtdb.firebaseio.com",
+    "project_id": "react-task-c2c86",
+    "storage_bucket": "react-task-c2c86.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022541000351:android:a753b716d7e4118a27bcaa",
+        "android_client_info": {
+          "package_name": "com.nbe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1022541000351-oq6m97tq672pms4o9hhiaus9nhnofs15.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzUGZGs_QWYNdSg40Zxs-Imb7dizlDFmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1022541000351-oq6m97tq672pms4o9hhiaus9nhnofs15.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
