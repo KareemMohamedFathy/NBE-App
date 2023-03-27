@@ -64,8 +64,8 @@ function TransferScreen({navigation, route}) {
     });
   };
   const windowHeight = Dimensions.get('window').height;
-  function gotoconfirm() {
-    storeTransfer();
+  function gotoconfirm(values) {
+    storeTransfer(values);
     navigation.navigate('ConfirmMobile', {
       source: 'Transfer',
     });
@@ -81,8 +81,13 @@ function TransferScreen({navigation, route}) {
   //   }
   //   return devicetoken;
   // }
-  async function storeTransfer() {
-    axios.post(BACKEND_URL + '/Transfer.json', transfer);
+  async function storeTransfer(values) {
+    values.date = transfer.date;
+    values.reciever = transfer.reciever;
+    values.sender = transfer.sender;
+    console.log('Values');
+    console.log(values);
+    axios.post(BACKEND_URL + '/Transfer.json', values);
     //const devicetoken = await getUserToken();
     await sendPushNotification(devicetoken);
   }
@@ -153,8 +158,11 @@ function TransferScreen({navigation, route}) {
         <CustomDropDown label={strings.transferto} />
         <Formik
           initialValues={{
-            transferreason: '',
-            transferamount: '',
+            title: '',
+            amount: '',
+            reciever: '',
+            sender: '',
+            date: '',
           }}
           onSubmit={values => gotoconfirm(values)}>
           {({handleChange, handleBlur, handleSubmit, values}) => (
@@ -162,17 +170,17 @@ function TransferScreen({navigation, route}) {
               <CustomTextInput
                 label={strings.amount}
                 value={values.transferamount}
-                onChangeText={handleChange('transferamount')}
+                onChangeText={handleChange('amount')}
                 placeholder={strings.amountotransfer}
                 keyboardType={'number-pad'}
               />
               <CustomTextInput
                 label={strings.reasontotransfer}
                 value={values.transferreason}
-                onChangeText={handleChange('transferreason')}
+                onChangeText={handleChange('title')}
                 placeholder={strings.reasontotransfer}
               />
-              <Button bstyle={{marginTop: 24}} onPress={() => gotoconfirm()}>
+              <Button bstyle={{marginTop: 24}} onPress={() => handleSubmit()}>
                 {strings.transfer}{' '}
               </Button>
             </View>

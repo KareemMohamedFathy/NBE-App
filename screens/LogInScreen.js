@@ -209,6 +209,7 @@ function LogInScreen({navigation}) {
                   }
                   onBlur={() => handleInputBlur('password')}
                   onFocus={() => handleInputFocus('password')}
+                  secureTextEntry={true}
                 />
               </View>
             </View>

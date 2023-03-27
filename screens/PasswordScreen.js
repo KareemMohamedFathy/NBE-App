@@ -223,7 +223,12 @@ function PasswordScreen({navigation}) {
                 top: 0,
                 right: en ? '5%' : '0%',
               }}>
-              <Image source={require('../assets/closeeye.png')}></Image>
+              <Image
+                source={
+                  passwordSecure
+                    ? require('../assets/closeeye.png')
+                    : require('../assets/openeye.png')
+                }></Image>
             </Pressable>
           </View>
         </View>
@@ -281,7 +286,12 @@ function PasswordScreen({navigation}) {
                 top: 0,
                 right: en ? '5%' : '0%',
               }}>
-              <Image source={require('../assets/closeeye.png')}></Image>
+              <Image
+                source={
+                  passwordSecure
+                    ? require('../assets/closeeye.png')
+                    : require('../assets/openeye.png')
+                }></Image>
             </Pressable>
           </View>
         </View>
