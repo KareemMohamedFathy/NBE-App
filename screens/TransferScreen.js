@@ -31,7 +31,7 @@ function TransferScreen({navigation, route}) {
   const isFocused = useIsFocused();
   const localThemes = useTheme();
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
-  const {benid} = route.params ? route.params : '';
+  const {benid, phoneno, devicetoken} = route.params ? route.params : '';
 
   const currentL = useSelector(state => state.counter.value);
   const [transferamount, setTransferamount] = useState('');
@@ -70,8 +70,58 @@ function TransferScreen({navigation, route}) {
       source: 'Transfer',
     });
   }
-  function storeTransfer() {
+  // async function getUserToken() {
+  //   const response = await axios.get(
+  //     BACKEND_URL + `/Users.json?orderBy="phoneno"&equalTo="${phoneno}"`,
+  //   );
+  //   let devicetoken = '';
+
+  //   for (const key in response.data) {
+  //     devicetoken = response.data[key].devicetoken;
+  //   }
+  //   return devicetoken;
+  // }
+  async function storeTransfer() {
     axios.post(BACKEND_URL + '/Transfer.json', transfer);
+    //const devicetoken = await getUserToken();
+    await sendPushNotification(devicetoken);
+  }
+  async function sendPushNotification(devicetoken) {
+    const FIREBASE_API_KEY =
+      'AAAA7hQxbp8:APA91bFW4th5uoFDwXd2SbnIOQvLOHm4zUm6x3tnqFCTXaE78jyVWUhHKvFABj3N0o0RDunt5EwPll-zWc39EUVKHrC_A_Vx_5xDVrmcm0JuH06hkKDhydvlSwuXsg__TGebkBtJ76Ed';
+    const message = {
+      registration_ids: [
+        devicetoken, // 'cbXgpm2GTgyqR5-_Lj_r4C:APA91bG1kcJ9PGG4kl6UvYuAm4tNffoFhpy2g0BByjzCb-63pTt09bbABZhHg2Cj0sPlHQD-14iMK3tCnvndmSIwlRbcN4f2FdSNjQoxGThqQgzIDOiYDJcEH517KOajSYWsfjgYtjNE',
+        ,
+      ],
+      notification: {
+        title: 'Money Recieved',
+        body: 'Money was transfered to your account',
+        vibrate: 1,
+        sound: 1,
+        show_in_foreground: true,
+        priority: 'high',
+        content_available: true,
+      },
+      data: {
+        title: 'Money Recieved',
+        body: 'Money was transfered to your account',
+
+        score: 50,
+        wicket: 1,
+      },
+    };
+
+    let headers = new Headers({
+      'Content-Type': 'application/json',
+      Authorization: 'key=' + FIREBASE_API_KEY,
+    });
+
+    let response = await fetch('https://fcm.googleapis.com/fcm/send', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(message),
+    });
   }
 
   return (

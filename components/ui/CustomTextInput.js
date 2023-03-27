@@ -19,7 +19,6 @@ function CustomTextInput({
   const en = currentL === 'en';
   const localThemes = useTheme();
   const styles = useGlobalStyles();
-  console.log('hayo' + keyboardType);
   const [isInputFocused, setIsInputFocused] = useState({
     label: false,
   });
@@ -29,7 +28,6 @@ function CustomTextInput({
     });
   };
   const handleInputBlur = textinput => {
-    console.log('bye');
     setIsInputFocused({
       [textinput]: false,
     });

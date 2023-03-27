@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
-
 import React, {useEffect, useState} from 'react';
+import {QueryClient, QueryClientProvider} from 'react-query';
 import {
   Image,
   Pressable,
@@ -43,16 +43,45 @@ import {Switch} from 'react-native-gesture-handler';
 import {store} from './store';
 import strings from './components/Language/AuthNames';
 import {changeLanguage} from './counter/CounterSlice';
+import messaging from '@react-native-firebase/messaging';
 
 import {black} from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import AddBeneficiariesScreen from './screens/AddBeneficiariesScreen';
 import {SheetProvider} from 'react-native-actions-sheet';
+import PushNotification from 'react-native-push-notification';
 const Drawer = createDrawerNavigator();
+const {initializeApp} = require('firebase-admin/app');
 
 function App() {
+  const queryClient = new QueryClient();
   const Tab = createBottomTabNavigator();
   useEffect(() => {
     SplashScreen.hide();
+    //  messaging().NotificationAndroidPriority.PRIORITY_HIGH;
+    const message = {
+      token:
+        'cbXgpm2GTgyqR5-_Lj_r4C:APA91bG1kcJ9PGG4kl6UvYuAm4tNffoFhpy2g0BByjzCb-63pTt09bbABZhHg2Cj0sPlHQD-14iMK3tCnvndmSIwlRbcN4f2FdSNjQoxGThqQgzIDOiYDJcEH517KOajSYWsfjgYtjNE',
+      notification: {
+        title: 'Hello!',
+        body: 'This is a test notification',
+      },
+    };
+    // getFCMToken();
+    messaging().onMessage(async remoteMessage => {
+      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('Message  handled in the background!', remoteMessage);
+    });
+    messaging().onMessage(async remoteMessage => {
+      console.log('Message being tested  ', remoteMessage);
+      PushNotification.localNotification({
+        channelId: 'channel-id',
+        title: remoteMessage.notification.title, // (optional)
+        message: remoteMessage.notification.body,
+      });
+    });
   }, []);
 
   const Stack = createNativeStackNavigator();
@@ -839,49 +868,51 @@ function App() {
       <SheetProvider>
         <NavigationContainer
           theme={scheme === 'dark' ? MyDarkTheme : MyDefaultTheme}>
-          <StatusBar backgroundColor="transparent" translucent={true} />
-          <Stack.Navigator initialRouteName="LogIn">
-            {/* <Stack.Screen
+          <QueryClientProvider client={queryClient}>
+            <StatusBar backgroundColor="transparent" translucent={true} />
+            <Stack.Navigator initialRouteName="LogIn">
+              {/* <Stack.Screen
               name="Splash"
               component={SplashScreen}
               options={{headerShown: false}}
             /> */}
-            <Stack.Screen
-              name="LogIn"
-              component={LogInScreen}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="Finished"
-              component={FinishScreen}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={{headerShown: false}}
-            />
+              <Stack.Screen
+                name="LogIn"
+                component={LogInScreen}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Finished"
+                component={FinishScreen}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
+                options={{headerShown: false}}
+              />
 
-            <Stack.Screen
-              name="ConfirmMobile"
-              component={ConfirmMobileScreen}
-              options={{headerShown: false}}
-            />
+              <Stack.Screen
+                name="ConfirmMobile"
+                component={ConfirmMobileScreen}
+                options={{headerShown: false}}
+              />
 
-            <Stack.Screen
-              name="Password"
-              component={PasswordScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
+              <Stack.Screen
+                name="Password"
+                component={PasswordScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
 
-            <Stack.Screen
-              name="Root"
-              component={Root}
-              options={{headerShown: false}}
-            />
-          </Stack.Navigator>
+              <Stack.Screen
+                name="Root"
+                component={Root}
+                options={{headerShown: false}}
+              />
+            </Stack.Navigator>
+          </QueryClientProvider>
         </NavigationContainer>
       </SheetProvider>
     </Provider>

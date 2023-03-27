@@ -49,7 +49,6 @@ function HomeScreen({navigation, route}) {
     getBenefeciaries();
   }, []);
   function getBenefeciaries() {
-    console.log(uid);
     database()
       .ref('Benefeciaries')
       .orderByChild('myid')
@@ -63,7 +62,6 @@ function HomeScreen({navigation, route}) {
             benf.push(z);
           });
         }
-        console.log(benf.length);
 
         setUsers(benf);
       });
@@ -102,10 +100,11 @@ function HomeScreen({navigation, route}) {
       },
     });
   });
-  function gotoTransfer(id) {
-    console.log('the id' + id);
+  function gotoTransfer(id, phoneno, devicetoken) {
     navigation.navigate('Transfer', {
       benid: id,
+      phoneno: phoneno,
+      devicetoken: devicetoken,
     });
   }
 

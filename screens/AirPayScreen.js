@@ -50,7 +50,6 @@ function AirPayScreen({navigation}) {
   }
   function tryAgain() {
     // setVisible(!visible);
-    //console.log('plz');
     SheetManager.show('FingerPrintHomeModal', {
       payload: {value: getFingerPrint, tryagain: isAirPayFailedVisible},
     });
@@ -103,9 +102,7 @@ function AirPayScreen({navigation}) {
           horizontal={true}>
           <DraxView
             style={{marginVertical: 30, marginHorizontal: 20}}
-            onDragStart={() => {
-              console.log('start drag');
-            }}
+            onDragStart={() => {}}
             payload="0">
             <Pressable
               onPress={() =>
@@ -116,9 +113,7 @@ function AirPayScreen({navigation}) {
           </DraxView>
 
           <DraxView
-            onDragStart={() => {
-              console.log('start drag');
-            }}
+            onDragStart={() => {}}
             style={{marginVertical: 30, marginHorizontal: 20}}
             payload="1">
             <Pressable
@@ -132,9 +127,7 @@ function AirPayScreen({navigation}) {
           </DraxView>
 
           <DraxView
-            onDragStart={() => {
-              console.log('start drag');
-            }}
+            onDragStart={() => {}}
             payload="2"
             style={{marginVertical: 30, marginHorizontal: 20}}>
             <Pressable
@@ -161,38 +154,26 @@ function AirPayScreen({navigation}) {
             {!isCard && (
               <DraxView
                 style={{height: 150}}
-                onReceiveDragEnter={({dragged: {payload}}) => {
-                  console.log(`hello ${payload}`);
-                }}
-                onReceiveDragExit={({dragged: {payload}}) => {
-                  console.log(`goodby ${allcards[1]}`);
-                }}
+                onReceiveDragEnter={({dragged: {payload}}) => {}}
+                onReceiveDragExit={({dragged: {payload}}) => {}}
                 onReceiveDragDrop={({dragged: {payload}}) => {
-                  console.log(`receivedx ${allcards[1]}`);
                   setChoosenCard(allcards[payload]);
 
                   setisCard(true);
                 }}>
-                <Text style={styles.hold}>{choosenCard}</Text>
+                <Text style={styles.hold}>{strings.dragcard}</Text>
               </DraxView>
             )}
-            {isCard &&
-              (console.log('hi'),
-              (
-                <DraxView
-                  onReceiveDragEnter={({dragged: {payload}}) => {
-                    console.log(`hello ${payload}`);
-                  }}
-                  onReceiveDragExit={({dragged: {payload}}) => {
-                    console.log(`goodbyex ${payload}`);
-                  }}
-                  onReceiveDragDrop={({dragged: {payload}}) => {
-                    console.log(`receivedx ${payload}`);
-                    setChoosenCard(allcards[payload]);
-                  }}>
-                  <Image source={choosenCard} style={{}} />
-                </DraxView>
-              ))}
+            {isCard && (
+              <DraxView
+                onReceiveDragEnter={({dragged: {payload}}) => {}}
+                onReceiveDragExit={({dragged: {payload}}) => {}}
+                onReceiveDragDrop={({dragged: {payload}}) => {
+                  setChoosenCard(allcards[payload]);
+                }}>
+                <Image source={choosenCard} style={{}} />
+              </DraxView>
+            )}
           </View>
         </View>
 

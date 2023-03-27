@@ -11,6 +11,7 @@ import {
   StatusBar,
   Dimensions,
 } from 'react-native';
+import MapView, {Marker} from 'react-native-maps';
 import Button from '../components/ui/Button';
 
 function AtmScreen({navigation}) {
@@ -30,59 +31,169 @@ function AtmScreen({navigation}) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo}></Image>
-      <View style={{flex: 1}}>
-        <ImageBackground
-          source={require('../assets/finished.png')}
-          style={styles.rootScreen}
-          imageStyle={styles.backgroundImage}>
-          <View style={{paddingHorizontal: 25, flex: 1}}>
-            <Text style={styles.cong}>Congratulations</Text>
+      <MapView
+        style={styles.mapStyle}
+        initialRegion={{
+          latitude: 30.0775851,
+          longitude: 31.342583,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+        customMapStyle={mapStyle}>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.0775851,
+            longitude: 31.342583,
+          }}
+          style={{width: 50, height: 50}}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.0375851,
+            longitude: 31.342583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch 2'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
 
-            <Text style={[styles.cong, {fontSize: 16, fontWeight: '400'}]}>
-              You have successfully registered in NBE online banking service
-            </Text>
-            <View
-              style={{
-                flexDirection: 'column',
-                marginTop: 'auto',
-                marginBottom: 25,
-              }}>
-              <Button
-                bstyle={{backgroundColor: 'white'}}
-                textstyle={{color: '#007236'}}>
-                Finish
-              </Button>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.0975851,
+            longitude: 31.342583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch 3'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.055851,
+            longitude: 31.362583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch 4'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.0975851,
+            longitude: 31.362583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch 5'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.0475851,
+            longitude: 31.322583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch 6'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.055851,
+            longitude: 31.322583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+        <Marker
+          draggable
+          coordinate={{
+            latitude: 30.0775851,
+            longitude: 31.302583,
+          }}
+          onDragEnd={e => alert(JSON.stringify(e.nativeEvent.coordinate))}
+          title={'Bank Branch'}
+          description={'NBE branch is located here'}>
+          <Image
+            source={require('../assets/marker.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+          />
+        </Marker>
+      </MapView>
     </View>
   );
 }
+const mapStyle = [
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [
+      {
+        visibility: 'off',
+      },
+    ],
+  },
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.stroke',
+    stylers: [
+      {
+        visibility: 'off',
+      },
+    ],
+  },
+];
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'black',
     flex: 1,
-    backgroundColor: '#007236',
-    paddingTop: 30,
   },
-  rootScreen: {
+  mapStyle: {
     flex: 1,
-    backgroundColor: '#007236',
-  },
-  backgroundImage: {
-    resizeMode: 'stretch',
-  },
-  logo: {
-    marginLeft: 'auto',
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  cong: {
-    fontFamily: 'Roboto',
-    fontSize: 30,
-    fontWeight: '700',
-    color: 'white',
+    backgroundColor: 'black',
   },
 });
 export default AtmScreen;

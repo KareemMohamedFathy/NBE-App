@@ -16,6 +16,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BackButton from '../components/ui/BackButton';
 import Button from '../components/ui/Button';
+import messaging from '@react-native-firebase/messaging';
+
 import MyDarkTheme from '../mythemes/MyDarkTheme';
 import MyDefaultTheme from '../mythemes/MyDefaultTheme';
 import {useSelector} from 'react-redux';
@@ -28,10 +30,21 @@ function PasswordScreen({navigation}) {
   const [confirmPassword, onChangeconfirmPassword] = useState('');
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
   const name = 'Chris';
-  function storeuser(phoneno, userid) {
-    axios.put(BACKEND_URL + `/Users/${userid}/.json`, {
+  async function getFCMToken() {
+    try {
+      const token = await messaging().getToken();
+      console.log(token);
+      return token;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  async function storeuser(phoneno, userid) {
+    const devicetoken = await getFCMToken();
+    await axios.put(BACKEND_URL + `/Users/${userid}/.json`, {
       phoneno: phoneno,
       userid: userid,
+      devicetoken: devicetoken,
     });
   }
 

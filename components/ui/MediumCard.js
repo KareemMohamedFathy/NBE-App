@@ -14,7 +14,8 @@ function MediumCard({
   const {dark} = useTheme();
   return (
     <View style={styles.outercontainer}>
-      <Pressable onPress={() => onPress(benid)}>
+      <Pressable
+        onPress={() => onPress(benid, itemData.phoneno, itemData.devicetoken)}>
         <View style={[styles.bstyle, bstyle]}>
           <Image
             source={{uri: imagepath + ''}}

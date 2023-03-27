@@ -13,6 +13,7 @@ import {
   TextInput,
   StatusBar,
   Dimensions,
+  Alert,
 } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -29,6 +30,7 @@ import storage from '@react-native-firebase/storage';
 import {firebase} from '@react-native-firebase/auth';
 import {Formik} from 'formik';
 import CustomTextInput from '../components/ui/CustomTextInput';
+import FormBack from '../components/ui/FormBack';
 
 function AddBeneficiariesScreen({navigation}) {
   const localThemes = useTheme();
@@ -36,8 +38,8 @@ function AddBeneficiariesScreen({navigation}) {
   const en = currentL === 'en';
   const styles = useGlobalStyles();
   const windowHeight = Dimensions.get('window').height;
-  const [phoneno, setPhoneno] = useState('');
   const [imageuri, setImageUri] = useState('');
+  const [userDeviceToken, setUserDeviceToken] = useState('');
 
   const [response, setResponse] = useState('');
 
@@ -65,16 +67,41 @@ function AddBeneficiariesScreen({navigation}) {
 
   function confirmAddingBen(values) {
     storeBenefeciary(values);
-    navigation.navigate('ConfirmMobile', {
-      source: 'AddBeneficiaries',
-      mobileNum: phoneno,
-    });
   }
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
+
+  async function verifyUserEmail(phoneno) {
+    const response = await axios.get(BACKEND_URL + '/Users.json');
+    console.log(phoneno + 'phoeno');
+    for (const key in response.data) {
+      const userphoneno = response.data[key].phoneno;
+      const devicetoken = response.data[key].devicetoken;
+      if (phoneno === userphoneno) {
+        setUserDeviceToken(devicetoken);
+      }
+    }
+  }
+
   async function storeBenefeciary(values) {
     values.image = await uploadImage();
     values.myid = uid;
-    axios.post(BACKEND_URL + '/Benefeciaries.json', values);
+
+    await verifyUserEmail(values.phoneno);
+    values.devicetoken = userDeviceToken;
+    console.log('hi' + userDeviceToken);
+    if (userDeviceToken) {
+      axios.post(BACKEND_URL + '/Benefeciaries.json', values);
+      navigation.navigate('ConfirmMobile', {
+        source: 'AddBeneficiaries',
+        mobileNum: values.phoneno,
+      });
+    } else {
+      Alert.alert(
+        'Mobile number',
+        'This user doesnot exist make sure the mobile number you entered is registered in the app',
+        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+      );
+    }
   }
   function openCamera() {
     const options = {
@@ -113,34 +140,8 @@ function AddBeneficiariesScreen({navigation}) {
   return (
     <ScrollView contentContainerStyle={{height: windowHeight + 150}}>
       <View style={styles.container}>
-        <View
-          style={{
-            flexDirection: en ? 'row' : 'row-reverse',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{flexDirection: 'row'}}>
-            <BackButton destination="Beneficiaries" />
-            <Image
-              source={require('../assets/Benf/notificationgrey.png')}
-              style={{
-                resizeMode: 'cover',
-                marginStart: en ? 6 : 0,
-                marginEnd: en ? 0 : 6,
-              }}
-            />
-          </View>
+        <FormBack />
 
-          <View>
-            <Image
-              source={
-                localThemes.dark
-                  ? require('../assets/darklogo.png')
-                  : require('../assets/logogreen.png')
-              }
-              style={{resizeMode: 'cover'}}
-            />
-          </View>
-        </View>
         <Pressable style={styles.camera} onPress={() => openCamera()}>
           <View>
             <Image
@@ -203,7 +204,7 @@ function AddBeneficiariesScreen({navigation}) {
                     en ? '045 - City Stars Mall' : ' 045 - فرع سيتي ستارز ',
                   ]}
                   onSelect={(selectedItem, index) => {
-                    setBranch(selectedItem);
+                    values.branch = selectedItem;
                   }}
                   renderDropdownIcon={() => {
                     return (

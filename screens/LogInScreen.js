@@ -85,6 +85,9 @@ function LogInScreen({navigation}) {
     });
   };
 
+  useEffect(() => {
+    //sendPushNotification();
+  });
   return (
     <View style={styles.container}>
       {/* <StatusBar translucent={true} backgroundColor="transparent" /> */}

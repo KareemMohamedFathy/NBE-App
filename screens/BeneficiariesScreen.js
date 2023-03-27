@@ -28,9 +28,40 @@ import MissonCompleteModal from '../components/MissionCompleteModal';
 import BeneficiarisOptionsModal from '../components/BeneficiarisOptionsModal';
 import axios from 'axios';
 import {firebase} from '@react-native-firebase/auth';
+import {useQuery} from 'react-query';
 
 function BeneficiariesScreen({navigation, route}) {
   const [visible, setVisible] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  const {data, isSuccess} = useQuery('getBenefeciaries', getBenefeciaries, {
+    onSuccess: data => {
+      console.log('succ');
+      let beneficiares = [];
+
+      console.log(data);
+
+      for (const key in data) {
+        const benefeciarie = {
+          benid: key,
+          firstname: data[key].firstname,
+          lastname: data[key].lastname,
+          email: data[key].email,
+          branch: data[key].branch,
+          phoneno: data[key].phoneno,
+          accountnumber: data[key].accountnumber,
+          image: data[key].image,
+          myid: data[key].myid,
+        };
+        beneficiares.push(benefeciarie);
+      }
+      setUsers(beneficiares);
+      console.log('----STop');
+      console.log(users);
+    },
+  });
+
+  // console.log(response.data);
   function isVisible() {
     setIndex(-1);
     setVisible(!visible);
@@ -64,26 +95,11 @@ function BeneficiariesScreen({navigation, route}) {
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
 
   async function getBenefeciaries() {
+    console.log('hi');
     const response = await axios.get(
       BACKEND_URL + `/Benefeciaries.json?orderBy="myid"&equalTo="${uid}"`,
     );
-    const beneficiares = [];
-
-    for (const key in response.data) {
-      const benefeciarie = {
-        benid: key,
-        firstname: response.data[key].firstname,
-        lastname: response.data[key].lastname,
-        email: response.data[key].email,
-        branch: response.data[key].branch,
-        phoneno: response.data[key].phoneno,
-        accountnumber: response.data[key].accountnumber,
-        image: response.data[key].image,
-        myid: response.data[key].myid,
-      };
-      beneficiares.push(benefeciarie);
-    }
-    return beneficiares;
+    return response.data;
   }
   function renderUserHistory(itemData) {
     let amount = parseFloat(itemData.item.amount).toFixed(2);
@@ -128,11 +144,7 @@ function BeneficiariesScreen({navigation, route}) {
     if (renderMode === 'grid') changeRenderMode();
     setIndex(index !== -1 ? -1 : itemdata.index);
     await getTransactions(itemdata.item.benid);
-    console.log('run');
-    console.log(history);
-    console.log('kuso');
   }
-  const [users, setUsers] = useState([]);
 
   function renderUsersDetailed(itemData) {
     return (
@@ -148,8 +160,6 @@ function BeneficiariesScreen({navigation, route}) {
     setModal(true);
   }
   async function getTransactions(benid) {
-    console.log(benid + 'Hi');
-
     const response = await axios.get(
       BACKEND_URL + `/Transfer.json?orderBy="sender"&equalTo="${uid}"`,
     );
@@ -167,16 +177,14 @@ function BeneficiariesScreen({navigation, route}) {
         history.push(transfer);
       }
     }
-    console.log(history);
-    console.log('why no history');
     setHistory(history);
   }
 
   useEffect(() => {
-    async function fetchBenefeciaries() {
-      setUsers(await getBenefeciaries());
-    }
-    fetchBenefeciaries();
+    // async function fetchBenefeciaries() {
+    //   setUsers(await getBenefeciaries());
+    // }
+    // fetchBenefeciaries();
 
     navigation.getParent().setOptions({
       tabBarLabelStyle: {

@@ -19,6 +19,7 @@ import MyDefaultTheme from '../mythemes/MyDefaultTheme';
 import {useDispatch, useSelector} from 'react-redux';
 import strings from './Language/AuthNames';
 import BackButton from './ui/BackButton';
+import FormBack from './ui/FormBack';
 function AddBeneficiariesModal(props) {
   const currentL = useSelector(state => state.counter.value);
   const en = currentL === 'en';
@@ -40,29 +41,6 @@ function AddBeneficiariesModal(props) {
             flex: 1,
           }}>
           <View style={styles.container}>
-            <View
-              style={{
-                flexDirection: en ? 'row' : 'row-reverse',
-                justifyContent: 'space-between',
-                marginTop: 0,
-              }}>
-              <View style={{flexDirection: 'row'}}>
-                <BackButton destination="Register" />
-                <Image
-                  source={require('../assets/Home/notification.png')}
-                  style={{marginStart: 6}}></Image>
-              </View>
-              <View>
-                <Image
-                  source={
-                    localThemes.dark
-                      ? require('../assets/darklogo.png')
-                      : require('../assets/logogreen.png')
-                  }
-                  style={{resizeMode: 'contain'}}
-                />
-              </View>
-            </View>
             <Text style={styles.header}>{strings.missioncomplete}</Text>
             <Text style={styles.subheader}>{strings.paymentsuccesfull}</Text>
             <Text style={styles.amount}>$5,542.00</Text>
