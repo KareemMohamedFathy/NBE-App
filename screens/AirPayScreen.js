@@ -153,7 +153,7 @@ function AirPayScreen({navigation}) {
             }}>
             {!isCard && (
               <DraxView
-                style={{height: 150}}
+                style={{height: 200}}
                 onReceiveDragEnter={({dragged: {payload}}) => {}}
                 onReceiveDragExit={({dragged: {payload}}) => {}}
                 onReceiveDragDrop={({dragged: {payload}}) => {

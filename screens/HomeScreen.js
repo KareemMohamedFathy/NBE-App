@@ -101,7 +101,7 @@ function HomeScreen({navigation, route}) {
     });
   });
   function gotoTransfer(id, phoneno, devicetoken) {
-    navigation.navigate('Transfer', {
+    navigation.navigate(strings.transfer, {
       benid: id,
       phoneno: phoneno,
       devicetoken: devicetoken,

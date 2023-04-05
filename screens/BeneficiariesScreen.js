@@ -284,7 +284,7 @@ function BeneficiariesScreen({navigation, route}) {
           <FlatList
             data={history}
             renderItem={renderUserHistory}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.benid}
           />
         </View>
       )}

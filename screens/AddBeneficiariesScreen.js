@@ -174,7 +174,7 @@ function AddBeneficiariesScreen({navigation}) {
           onSubmit={values => confirmAddingBen(values)}>
           {({handleChange, handleBlur, handleSubmit, values}) => (
             <View style={{flex: 1}}>
-              <View style={{flexDirection: en ? 'row' : 'ro-reverse'}}>
+              <View style={{flexDirection: en ? 'row' : 'row-reverse'}}>
                 <CustomTextInput
                   label={strings.firstname}
                   value={values.firstname}

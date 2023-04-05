@@ -35,7 +35,7 @@ function BeneficiarisOptionsModal(props) {
   const localThemes = useTheme();
   function goToTransfer() {
     props.onPress();
-    navigation.navigate('Transfer', {
+    navigation.navigate(strings.transfer, {
       benid: benid,
     });
   }
