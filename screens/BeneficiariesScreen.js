@@ -28,39 +28,43 @@ import MissonCompleteModal from '../components/MissionCompleteModal';
 import BeneficiarisOptionsModal from '../components/BeneficiarisOptionsModal';
 import axios from 'axios';
 import {firebase} from '@react-native-firebase/auth';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {deleteBenefciaries, getBenefeciaries, getTransfers} from '../DB/Remote';
 
 function BeneficiariesScreen({navigation, route}) {
   const [visible, setVisible] = useState(false);
+  const queryClient = useQueryClient();
   const [users, setUsers] = useState([]);
 
-  const {data, isSuccess} = useQuery('getBenefeciaries', getBenefeciaries, {
-    onSuccess: data => {
-      console.log('succ');
-      let beneficiares = [];
+  const uid = firebase.auth().currentUser?.uid;
+  const [benId, setBenId] = useState([]);
 
-      console.log(data);
-
-      for (const key in data) {
-        const benefeciarie = {
-          benid: key,
-          firstname: data[key].firstname,
-          lastname: data[key].lastname,
-          email: data[key].email,
-          branch: data[key].branch,
-          phoneno: data[key].phoneno,
-          accountnumber: data[key].accountnumber,
-          image: data[key].image,
-          myid: data[key].myid,
-        };
-        beneficiares.push(benefeciarie);
-      }
-      setUsers(beneficiares);
-      console.log('----STop');
-      console.log(users);
+  const {data, isSuccess} = useQuery(
+    'getBenefeciaries',
+    () => {
+      return getBenefeciaries(uid);
+    },
+    {
+      onSuccess: data => {},
+    },
+  );
+  const transfers = useQuery(
+    'getTransfers',
+    () => {
+      return getTransfers(uid);
+    },
+    {
+      onSuccess: data => {
+        getTransactions(benId);
+      },
+    },
+  );
+  const mutation = useMutation({
+    mutationFn: values => deleteBenefciaries(values),
+    onSuccess: () => {
+      queryClient.invalidateQueries('getBenefeciaries');
     },
   });
-
   // console.log(response.data);
   function isVisible() {
     setIndex(-1);
@@ -79,7 +83,6 @@ function BeneficiariesScreen({navigation, route}) {
   const [index, setIndex] = useState(-1);
   const [optionsindex, setOptionsIndex] = useState(-1);
   const [remove, setRemove] = useState(true);
-  const uid = firebase.auth().currentUser?.uid;
 
   const currentL = useSelector(state => state.counter.value);
   const en = currentL === 'en';
@@ -94,13 +97,6 @@ function BeneficiariesScreen({navigation, route}) {
   }
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
 
-  async function getBenefeciaries() {
-    console.log('hi');
-    const response = await axios.get(
-      BACKEND_URL + `/Benefeciaries.json?orderBy="myid"&equalTo="${uid}"`,
-    );
-    return response.data;
-  }
   function renderUserHistory(itemData) {
     let amount = parseFloat(itemData.item.amount).toFixed(2);
     return (
@@ -126,7 +122,8 @@ function BeneficiariesScreen({navigation, route}) {
     setRemove(!remove);
     isVisible();
     setOptionsIndex(-1);
-    axios.delete(`${BACKEND_URL}/Benefeciaries/${id}.json`);
+    mutation.mutate(id);
+    // axios.delete(`${BACKEND_URL}/Benefeciaries/${id}.json`);
   }
   function renderUsersItem(itemData) {
     return (
@@ -141,6 +138,7 @@ function BeneficiariesScreen({navigation, route}) {
     );
   }
   async function transactionHistory(itemdata) {
+    setBenId(itemdata.item.benid);
     if (renderMode === 'grid') changeRenderMode();
     setIndex(index !== -1 ? -1 : itemdata.index);
     await getTransactions(itemdata.item.benid);
@@ -160,10 +158,11 @@ function BeneficiariesScreen({navigation, route}) {
     setModal(true);
   }
   async function getTransactions(benid) {
-    const response = await axios.get(
-      BACKEND_URL + `/Transfer.json?orderBy="sender"&equalTo="${uid}"`,
-    );
+    const response = await transfers.refetch();
 
+    // const response = await axios.get(
+    //   BACKEND_URL + `/Transfer.json?orderBy="sender"&equalTo="${uid}"`,
+    // );
     const history = [];
     for (const key in response.data) {
       benkey = response.data[key].reciever;
@@ -193,7 +192,7 @@ function BeneficiariesScreen({navigation, route}) {
         fontSize: 11,
       },
     });
-  }, [route, remove]);
+  }, [remove]);
   return (
     <View style={styles.container}>
       <HomeBanner />
@@ -228,7 +227,7 @@ function BeneficiariesScreen({navigation, route}) {
         </View>
       )}
 
-      {users.length == 0 && (
+      {data.length == 0 && (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Image
             source={require('../assets/Benf/noben.png')}
@@ -251,11 +250,11 @@ function BeneficiariesScreen({navigation, route}) {
 
       <View
         style={{
-          flex: users.length < 1 ? 1 : index == -1 ? 10 : 1,
+          flex: data.length < 1 ? 1 : index == -1 ? 10 : 1,
           marginTop: 15,
         }}>
         <FlatList
-          data={index == -1 ? users : [users[index]]}
+          data={index == -1 ? data : [data[index]]}
           renderItem={
             renderMode === 'grid' ? renderUsersItem : renderUsersDetailed
           }
@@ -293,19 +292,19 @@ function BeneficiariesScreen({navigation, route}) {
         modalon={visible}
         benid={
           index !== -1
-            ? users[index].id
+            ? data[index].id
             : optionsindex === -1
             ? 'no reciever'
-            : users[optionsindex].id
+            : data[optionsindex].id
         }
         onPress={isVisible}
         index={index}
         bendata={
           index !== -1
-            ? users[index]
+            ? data[index]
             : optionsindex === -1
             ? 'no reciever'
-            : users[optionsindex]
+            : data[optionsindex]
         }
         onDelete={deleteBen}></BeneficiarisOptionsModal>
     </View>

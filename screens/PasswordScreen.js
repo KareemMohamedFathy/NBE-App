@@ -25,11 +25,19 @@ import strings from '../components/Language/AuthNames';
 import auth from '@react-native-firebase/auth';
 import {database} from '@react-native-firebase/database';
 import axios from 'axios';
+import {useMutation} from 'react-query';
+import {storeuser} from '../DB/Remote';
 function PasswordScreen({navigation}) {
   const [password, onChangePassword] = useState('');
   const [confirmPassword, onChangeconfirmPassword] = useState('');
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
   const name = 'Chris';
+  const mutation = useMutation({
+    mutationFn: user => storeuser(user),
+    onSuccess: () => {
+      // Invalidate and refetch
+    },
+  });
   async function getFCMToken() {
     try {
       const token = await messaging().getToken();
@@ -39,18 +47,20 @@ function PasswordScreen({navigation}) {
       console.log(e);
     }
   }
-  async function storeuser(phoneno, userid) {
+
+  /* async function storeuser(phoneno, userid) {
     const devicetoken = await getFCMToken();
     await axios.put(BACKEND_URL + `/Users/${userid}/.json`, {
       phoneno: phoneno,
       userid: userid,
       devicetoken: devicetoken,
     });
-  }
+  }*/
 
   const [passwordSecure, onChangePasswordSecure] = useState(true);
   const [confirmPasswordSecure, onChangeConfirmPasswordSecure] = useState(true);
 
+  const [fcmToken, setFcmToken] = useState('');
   const [hasLowerCase, sethasLowerCase] = useState(false);
   const [hasUpperCase, sethasUpperCase] = useState(false);
   const [hasEight, sethasEight] = useState(false);
@@ -61,7 +71,12 @@ function PasswordScreen({navigation}) {
       .createUserWithEmailAndPassword(phoneno + '@nbe.com', password)
       .then(data => {
         console.log('User account created & signed in!');
-        storeuser(phoneno, data.user.uid);
+        console.log(data.user.uid + 'fuck u run');
+        mutation.mutate({
+          phoneno: phoneno,
+          userid: data.user.uid,
+          devicetoken: fcmToken,
+        });
         navigation.navigate('Finished');
       })
       .catch(error => {
@@ -82,7 +97,7 @@ function PasswordScreen({navigation}) {
       headerLeft: () => <BackButton destination={'ConfirmMobile'} />,
     });
   }, [navigation]);
-  function goToConfirm() {
+  async function goToConfirm() {
     if (!en) {
       sethasUpperCase(true);
     }
@@ -98,6 +113,10 @@ function PasswordScreen({navigation}) {
     ) {
       Alert.alert("You don't meet the password criteria");
     } else {
+      const token = await getFCMToken();
+      console.log('fraud');
+      setFcmToken(token);
+
       signUp(password);
     }
   }

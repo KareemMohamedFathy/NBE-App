@@ -26,10 +26,15 @@ import MyDefaultTheme from '../mythemes/MyDefaultTheme';
 import {firebase} from '@react-native-firebase/auth';
 import {Formik} from 'formik';
 import CustomTextInput from '../components/ui/CustomTextInput';
+import {useMutation, useQueryClient} from 'react-query';
+
+import {addTransfer} from '../DB/Remote';
 
 function TransferScreen({navigation, route}) {
   const isFocused = useIsFocused();
   const localThemes = useTheme();
+  const queryClient = useQueryClient();
+  console.log(queryClient.getQueriesData());
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
   const {benid, phoneno, devicetoken} = route.params ? route.params : '';
 
@@ -37,7 +42,13 @@ function TransferScreen({navigation, route}) {
   const [transferamount, setTransferamount] = useState('');
   const uid = firebase.auth().currentUser?.uid;
   const [transferreason, setTransferreason] = useState('');
-
+  const mutation = useMutation({
+    mutationFn: values => addTransfer(values),
+    onSuccess: () => {
+      console.log('riuuuuuuuuuuuuun');
+      queryClient.invalidateQueries('transferList');
+    },
+  });
   const en = currentL === 'en';
   const styles = useGlobalStyles();
   let transfer = {
@@ -87,7 +98,7 @@ function TransferScreen({navigation, route}) {
     values.sender = transfer.sender;
     console.log('Values');
     console.log(values);
-    axios.post(BACKEND_URL + '/Transfer.json', values);
+    mutation.mutate(values);
     //const devicetoken = await getUserToken();
     await sendPushNotification(devicetoken);
   }

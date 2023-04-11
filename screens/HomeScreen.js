@@ -37,6 +37,8 @@ import database from '@react-native-firebase/database';
 import axios from 'axios';
 import {get} from 'immer/dist/internal';
 import {SheetManager} from 'react-native-actions-sheet';
+import {useQuery, useQueryClient} from 'react-query';
+import {getBenefeciaries} from '../DB/Remote';
 
 function HomeScreen({navigation, route}) {
   const currentL = useSelector(state => state.counter.value);
@@ -45,31 +47,40 @@ function HomeScreen({navigation, route}) {
   const [users, setUsers] = useState([]);
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
   const uid = firebase.auth().currentUser?.uid;
+
+  const {data, isSuccess} = useQuery(
+    'getBenefeciaries',
+    () => {
+      return getBenefeciaries(uid);
+    },
+    {
+      onSuccess: data => {
+        //setUsers(data);
+      },
+    },
+  );
+  //  console.log(data);
   useEffect(() => {
-    getBenefeciaries();
+    //getBenefeciaries();
   }, []);
-  function getBenefeciaries() {
-    database()
-      .ref('Benefeciaries')
-      .orderByChild('myid')
-      .equalTo('' + uid)
-      .on('value', snapshot => {
-        const benf = [];
-        if (snapshot.exists) {
-          snapshot.forEach(response => {
-            const z = response.val();
-            z.benid = response.key;
-            benf.push(z);
-          });
-        }
+  // function getBenefeciaries() {
+  //   database()
+  //     .ref('Benefeciaries')
+  //     .orderByChild('myid')
+  //     .equalTo('' + uid)
+  //     .on('value', snapshot => {
+  //       const benf = [];
+  //       if (snapshot.exists) {
+  //         snapshot.forEach(response => {
+  //           const z = response.val();
+  //           z.benid = response.key;
+  //           benf.push(z);
+  //         });
+  //       }
 
-        setUsers(benf);
-      });
-
-    // const response = await axios.get(
-    //   BACKEND_URL + `/Benefeciaries.json?orderBy="myid"&equalTo="${uid}"`,
-    // );
-  }
+  //       setUsers(benf);
+  //     });
+  // }
 
   const isFocused = useIsFocused();
   const [visible, setVisible] = useState(false);
@@ -204,7 +215,7 @@ function HomeScreen({navigation, route}) {
         <View style={{}}>
           <ScrollView horizontal={false}>
             <FlatList
-              data={users}
+              data={data}
               renderItem={renderUsersItem}
               keyExtractor={item => item.benid}
               horizontal={true}

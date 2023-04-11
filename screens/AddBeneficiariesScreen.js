@@ -31,9 +31,13 @@ import {firebase} from '@react-native-firebase/auth';
 import {Formik} from 'formik';
 import CustomTextInput from '../components/ui/CustomTextInput';
 import FormBack from '../components/ui/FormBack';
+import getAllUsers, {Remote, addBeneficiaries} from '../DB/Remote';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 
 function AddBeneficiariesScreen({navigation}) {
   const localThemes = useTheme();
+  const queryClient = useQueryClient();
+
   const currentL = useSelector(state => state.counter.value);
   const en = currentL === 'en';
   const styles = useGlobalStyles();
@@ -44,7 +48,16 @@ function AddBeneficiariesScreen({navigation}) {
   const [response, setResponse] = useState('');
 
   const uid = firebase.auth().currentUser?.uid;
+  const mutation = useMutation({
+    mutationFn: values => addBeneficiaries(values),
+    onSuccess: () => {
+      queryClient.invalidateQueries('getBenefeciaries');
+    },
+  });
 
+  const {data, isSuccess} = useQuery('allUsers', getAllUsers, {
+    onSuccess: data => {},
+  });
   const [isInputFocused, setIsInputFocused] = useState({
     firstname: false,
     lastname: false,
@@ -69,15 +82,15 @@ function AddBeneficiariesScreen({navigation}) {
     storeBenefeciary(values);
   }
   const BACKEND_URL = 'https://react-task-c2c86-default-rtdb.firebaseio.com';
-
   async function verifyUserEmail(phoneno) {
-    const response = await axios.get(BACKEND_URL + '/Users.json');
+    const response = data;
     console.log(phoneno + 'phoeno');
-    for (const key in response.data) {
-      const userphoneno = response.data[key].phoneno;
-      const devicetoken = response.data[key].devicetoken;
+    for (const key in response) {
+      const userphoneno = response[key].phoneno;
+      const devicetoken = response[key].devicetoken;
       if (phoneno === userphoneno) {
         setUserDeviceToken(devicetoken);
+        return devicetoken;
       }
     }
   }
@@ -86,11 +99,13 @@ function AddBeneficiariesScreen({navigation}) {
     values.image = await uploadImage();
     values.myid = uid;
 
-    await verifyUserEmail(values.phoneno);
-    values.devicetoken = userDeviceToken;
-    console.log('hi' + userDeviceToken);
-    if (userDeviceToken) {
-      axios.post(BACKEND_URL + '/Benefeciaries.json', values);
+    const devicetoken = await verifyUserEmail(values.phoneno);
+    console.log('waiting');
+    console.log(devicetoken);
+    values.devicetoken = devicetoken;
+
+    if (devicetoken) {
+      mutation.mutate(values);
       navigation.navigate('ConfirmMobile', {
         source: 'AddBeneficiaries',
         mobileNum: values.phoneno,
